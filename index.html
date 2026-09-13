@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Castle Rock: Cockpit Vanguard 2060</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- FLIGHT SIMULATOR HUD OVERLAY -->
+  <div id="cockpit-hud" class="hidden">
+    <!-- Top System Annunciator Strip -->
+    <div class="hud-top-strip">
+      <div class="annunciator" id="gate-tracker">GATE: 2,400 M</div>
+      <div class="annunciator" id="warn-lock">TARGET LOCK: SCANNING</div>
+      <div class="annunciator" id="warn-hull">HULL: 100%</div>
+      <div class="quick-controls">
+        <button id="btn-music-toggle" class="hud-mini-btn">AUDIO: ON</button>
+        <button id="btn-pause" class="hud-mini-btn">PAUSE [ESC]</button>
+      </div>
+    </div>
+
+    <!-- HUD Off-Screen Compass & Objective Arrows Container -->
+    <div id="hud-nav-pointers"></div>
+  </div>
+
+  <!-- SECTOR CLEARED INTERMISSION DEBRIEF -->
+  <div id="intermission-screen" class="menu-panel intermission-panel hidden">
+    <h2 class="glow-title">HYPERSPACE JUMP REACHED</h2>
+    <h3 id="intermission-sector-title" class="sub-glow">Deep Lunar Outskirts</h3>
+    
+    <div class="debrief-box">
+      <div class="debrief-stat"><span>Sector Score:</span> <strong id="debrief-score">0</strong></div>
+      <div class="debrief-stat"><span>Citadel Hull:</span> <strong id="debrief-hull">100%</strong></div>
+      <div class="debrief-stat"><span>Next Checkpoint:</span> <strong id="debrief-next-level">Sector 2: Kuiper Gateway</strong></div>
+      <div class="transmission-text" id="debrief-transmission">
+        <em>Earth Tactical Relay:</em> "Checkpoint portal synchronized, Prince Julian. Hyper-burn corridor is clear. Prepare to warp."
+      </div>
+    </div>
+
+    <button id="btn-next-sector" class="menu-btn primary large-btn">ENGAGE HYPERDRIVE (NEXT LEVEL)</button>
+  </div>
+
+  <!-- INTERACTIVE MENU OVERLAY -->
+  <div id="menu-overlay" class="menu-overlay">
+    <!-- MAIN TITLE SCREEN -->
+    <div id="main-menu" class="menu-panel">
+      <h1 class="game-title">CASTLE ROCK</h1>
+      <h3 class="game-subtitle">2060: COCKPIT VANGUARD</h3>
+      
+      <div class="pilot-greeting">
+        COMMANDER: <span id="menu-pilot-display">PRINCE JULIAN</span>
+      </div>
+
+      <div class="menu-buttons">
+        <button id="btn-campaign" class="menu-btn primary">CAMPAIGN</button>
+        <button id="btn-profile" class="menu-btn">PILOT DOSSIER</button>
+        <button id="btn-saveload" class="menu-btn">DATA SLOTS</button>
+        <button id="btn-options" class="menu-btn">AVIONICS CONFIG</button>
+        <button id="btn-quit" class="menu-btn danger">SHUTDOWN CITADEL</button>
+      </div>
+    </div>
+
+    <!-- PILOT DOSSIER / PROFILE -->
+    <div id="profile-menu" class="menu-panel hidden">
+      <h2>COMMAND DOSSIER</h2>
+      <div class="form-group">
+        <label>COMMANDER NAME:</label>
+        <input type="text" id="input-pilot-name" class="game-input" maxlength="20" value="Prince Julian">
+      </div>
+      <div class="form-group">
+        <label>ROYAL HOUSE / CALLSIGN:</label>
+        <input type="text" id="input-callsign" class="game-input" maxlength="24" value="House of Rock">
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-save-profile" class="menu-btn primary">COMMIT PROFILE</button>
+        <button id="btn-back-profile" class="menu-btn secondary">BACK</button>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN SELECTION -->
+    <div id="campaign-menu" class="menu-panel hidden">
+      <h2>FLIGHT CAMPAIGN</h2>
+      <div class="menu-buttons">
+        <button id="btn-newgame" class="menu-btn primary">NEW VOYAGE (PROLOGUE)</button>
+        <button id="btn-continue" class="menu-btn">RESUME FLIGHT</button>
+        <button id="btn-back-campaign" class="menu-btn secondary">BACK</button>
+      </div>
+    </div>
+
+    <!-- STORY PROLOGUE WITH AUTOMATIC VOICEOVER -->
+    <div id="story-modal" class="menu-panel story-panel hidden">
+      <h2>MISSION LOG: YEAR 2060</h2>
+      <div class="voice-status-indicator">
+        <span class="live-blinker"></span> AUTOMATED VOICE FEED TRANSMITTING...
+      </div>
+      <div class="story-crawl-container" id="story-text-container">
+        <p>Earth, Year 2060. The Great Solar Rupture has extinguished global power grids, leaving humanity isolated and defenseless across the stars.</p>
+        <p>From the high-orbital lunar fortress of Castle Rock, Prince Julian watches the dying atmospheric glow of his home world.</p>
+        <p>Hostile alien battlecruisers and corsair flotillas have blockaded the orbital corridors, intercepting all survivors.</p>
+        <p>Refusing to perish in silence, Julian converts his family's ancient stone bastion into a star-cruiser, igniting prototype Spark-Drive thrusters.</p>
+        <p>Use your holographic radar and navigation trackers to locate the 15 Hyperspace Checkpoint Gates, blasting through alien armadas to return the surviving lunar spark core back home to Earth.</p>
+      </div>
+      <div class="story-actions">
+        <button id="btn-start-story" class="menu-btn primary">ENTER COCKPIT</button>
+        <button id="btn-skip-story" class="menu-btn secondary">MUTE & ABORT</button>
+      </div>
+    </div>
+
+    <!-- OPTIONS / AVIONICS CONFIG -->
+    <div id="options-menu" class="menu-panel hidden">
+      <h2>AVIONICS CONFIGURATION</h2>
+      <div class="options-grid">
+        <div class="option-row">
+          <span>CANVAS RENDERING DETAIL:</span>
+          <button id="opt-resolution-btn" class="opt-toggle-btn">HIGH (NATIVE)</button>
+        </div>
+        <div class="option-row">
+          <span>CINEMATIC SPACE SYNTH:</span>
+          <button id="opt-music-btn" class="opt-toggle-btn">ENABLED</button>
+        </div>
+        <div class="option-row">
+          <span>WEAPONS ACOUSTICS:</span>
+          <button id="opt-sound-btn" class="opt-toggle-btn">ENABLED</button>
+        </div>
+      </div>
+      <h3 class="sub-header">FLIGHT CONTROLS (CLICK TO REBIND)</h3>
+      <div id="rebind-list" class="rebind-list"></div>
+      <button id="btn-back-options" class="menu-btn secondary">BACK</button>
+    </div>
+
+    <!-- DATA SLOTS -->
+    <div id="saveload-menu" class="menu-panel hidden">
+      <h2>MISSION DATA SLOTS</h2>
+      <div id="slots-container" class="slots-list"></div>
+      <button id="btn-back-saveload" class="menu-btn secondary">BACK</button>
+    </div>
+
+    <!-- PAUSE MENU -->
+    <div id="pause-menu" class="menu-panel hidden">
+      <h2>FLIGHT SUSPENDED</h2>
+      <div class="menu-buttons">
+        <button id="btn-resume" class="menu-btn primary">RESUME FLIGHT</button>
+        <button id="btn-pause-options" class="menu-btn">AVIONICS CONFIG</button>
+        <button id="btn-quit-main" class="menu-btn secondary">ABORT TO MAIN MENU</button>
+      </div>
+    </div>
+
+    <!-- SHUTDOWN TERMINAL -->
+    <div id="quit-screen" class="menu-panel hidden">
+      <h2>CITADEL POWER OFFLINE</h2>
+      <p style="margin: 20px 0; color: #94a3b8;">Spark Thrusters disengaged. Magnetic locks anchored.</p>
+      <button id="btn-restart-terminal" class="menu-btn primary">RE-INITIALIZE SYSTEMS</button>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas"></canvas>
+  <script src="game.js"></script>
+</body>
+</html>
